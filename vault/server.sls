@@ -1,4 +1,4 @@
-{% from "vault/map.jinja" import vault with context -%}
+{% from slspath + "/map.jinja" import vault with context -%}
 
 include:
   - vault
@@ -13,8 +13,11 @@ include:
 
 /etc/vault/config/server.hcl:
   file.managed:
-    - source: salt://vault/files/server.hcl.jinja
+    - source: salt://{{ slspath }}/files/server.hcl.jinja
     - template: jinja
+    - context:
+      vault:
+        {{ vault | yaml }}
     - user: root
     - group: root
     - mode: 644
@@ -35,8 +38,11 @@ openssl:
 
 generate self signed SSL certs:
   cmd.script:
-    - source: salt://vault/files/cert-gen.sh.jinja
+    - source: salt://{{ slspath }}/files/cert-gen.sh.jinja
     - template: jinja
+    - context:
+      vault:
+        {{ vault | yaml }}
     - args: {{ vault.self_signed_cert.hostname }} {{ vault.self_signed_cert.password }}
     - cwd: /etc/vault
     - creates: /etc/vault/{{ vault.self_signed_cert.hostname }}.pem
@@ -51,8 +57,11 @@ generate self signed SSL certs:
 {%- if grains.init == 'systemd' %}
 /etc/systemd/system/vault.service:
   file.managed:
-    - source: salt://vault/files/vault_systemd.service.jinja
+    - source: salt://{{ slspath }}/files/vault_systemd.service.jinja
     - template: jinja
+    - context:
+      vault:
+        {{ vault | yaml }}
     - user: root
     - group: root
     - mode: 644
@@ -68,8 +77,11 @@ generate self signed SSL certs:
 {% elif grains.init == 'upstart' %}
 /etc/init/vault.conf:
   file.managed:
-    - source: salt://vault/files/vault_upstart.conf.jinja
+    - source: salt://{{ slspath }}/files/vault_upstart.conf.jinja
     - template: jinja
+    - context:
+      vault:
+        {{ vault | yaml }}
     - user: root
     - group: root
     - mode: 644

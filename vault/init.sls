@@ -1,4 +1,4 @@
-{% from "vault/map.jinja" import vault with context %}
+{% from slspath + "/map.jinja" import vault with context %}
 
 {% set version = vault.version %}
 
@@ -34,8 +34,11 @@
 
 /tmp/hashicorp.asc:
   file.managed:
-    - source: salt://vault/files/hashicorp.asc.jinja
+    - source: salt://{{ slspath }}/files/hashicorp.asc.jinja
     - template: jinja
+    - context:
+      vault:
+        {{ vault | yaml }}
 
 vault_gpg_pkg:
   pkg.installed:

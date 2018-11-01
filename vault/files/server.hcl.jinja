@@ -1,4 +1,3 @@
-{%- from "vault/map.jinja" import vault with context -%}
 {%- if vault.backend %}
 backend "{{ vault.backend.type }}" {
   {%- if vault.backend.type == "s3" %}

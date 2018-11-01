@@ -1,5 +1,5 @@
-{% import_yaml "vault/defaults.yaml" as defaults %}
-{% import_yaml "vault/osfamilymap.yaml" as osfamilymap %}
+{% import_yaml slspath + "/defaults.yaml" as defaults %}
+{% import_yaml slspath + "/osfamilymap.yaml" as osfamilymap %}
 
 {% set vault = salt['grains.filter_by'](
     defaults,
