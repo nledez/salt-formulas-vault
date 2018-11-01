@@ -9,6 +9,9 @@ backend "{{ vault.backend.type }}" {
 }
 {% endif -%}
 
+{%- if vault.ui %}
+ui = true
+{% endif %}
 listener "{{ vault.listen_protocol }}" {
   address = "{{ vault.listen_address }}:{{ vault.listen_port }}"
   tls_disable = {{ vault.tls_disable }}
