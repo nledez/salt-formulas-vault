@@ -1,2 +1,15 @@
-RedHat:
-  gpg_pkg: gnupg2
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+---
+Debian:
+  setcap_pkg: libcap2-bin
+
+Suse:
+  gpg_pkg: gpg2
+  setcap_pkg: libcap-progs
+
+Arch:
+  gpg_pkg: gnupg
+
+MacOS:
+  platform: darwin_amd64

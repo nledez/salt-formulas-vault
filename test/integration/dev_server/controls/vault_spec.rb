@@ -4,20 +4,10 @@ describe command('/usr/local/bin/vault -version') do
   its(:stdout) { should match(/^Vault v[0-9\.]+ \('[0-9a-f]+'\)/) }
 end
 
-describe command('getcap $(readlink -f /usr/local/bin/vault)') do
-  its(:exit_status) { should eq 0 }
-  its(:stderr) { should be_empty }
-  its(:stdout) { should match(/\/vault = cap_ipc_lock\+ep$/) }
-end
-
-describe file('/etc/vault/config/server.hcl') do
-  it { should be_a_file }
-end
-
 describe.one do
   describe file('/etc/systemd/system/vault.service') do
     it { should be_a_file }
-    its(:content) { should_not match /syslog/ }
+    its(:content) { should_not match(/syslog/) }
   end
 
   describe file('/etc/init/vault.conf') do
@@ -30,16 +20,20 @@ describe service('vault') do
   it { should be_running }
 end
 
+describe file("/etc/vault/conf.d/config.json") do
+  it { should_not be_a_file }
+end
+
 describe.one do
   describe command('journalctl -u vault') do
     its(:exit_status) { should eq 0 }
     its(:stderr) { should be_empty }
-    its(:stdout) { should match /Vault server started/ }
+    its(:stdout) { should match(/WARNING! dev mode is enabled!/) }
   end
 
   describe file('/var/log/vault.log') do
     it { should be_a_file }
-    its(:content) { should match(/Vault server started/) }
+    its(:content) { should match(/WARNING! dev mode is enabled!/) }
   end
 end
 
@@ -53,14 +47,6 @@ describe http('http://127.0.0.1:8200/v1/sys/seal-status') do
 end
 
 describe json(content: http('http://127.0.0.1:8200/v1/sys/seal-status').body) do
-    its('initialized') { should eq false }
-    its('sealed') { should eq true }
-end
-
-describe file('/etc/vault/localhost.pem') do
-  it { should be_a_file }
-end
-
-describe file('/etc/vault/localhost-nopass.key') do
-  it { should be_a_file }
+    its('initialized') { should eq true }
+    its('sealed') { should eq false }
 end
