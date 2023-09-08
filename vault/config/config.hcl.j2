@@ -1,0 +1,58 @@
+cluster_addr  = "https://{{ vault.servers_ips[vault.config.hostname] }}:8201"
+api_addr      = "https://{{ vault.servers_ips[vault.config.hostname] }}:8200"
+{%- if vault.config.disable_mlock %}
+disable_mlock = true
+{%- endif %}
+{%- if vault.config.ui %}
+ui = true
+{%- endif %}
+
+listener "tcp" {
+  address            = "0.0.0.0:8200"
+  tls_cert_file      = "{{ vault.tls.cert_path | default('/var/lib/vault/tls/vault-cert.pem') }}"
+  tls_key_file       = "{{ vault.tls.cert_path | default('/var/lib/vault/tls/vault-key.pem') }}"
+  tls_client_ca_file = "{{ vault.tls.ca_path | default('/var/lib/vault/tls/vault-ca.pem') }}"
+}
+
+{%- if vault.config.service_registration %}
+
+service_registration "{{ vault.config.service_registration.type }}" {
+  address = "{{ vault.config.service_registration.address }}"
+  scheme = "{{ vault.config.service_registration.scheme }}"
+}
+{%- endif %}
+
+storage "raft" {
+  path    = "/var/lib/vault/data"
+  node_id = "{{ vault["config"]["hostname"] }}"
+
+{% for server in vault["config"]["storage"]["retry_join"] %}
+  retry_join {
+    leader_tls_servername   = "{{ server }}"
+    leader_api_addr         = "https://{{ vault.servers_ips[server] }}:8200"
+    leader_ca_cert_file     = "{{ vault.tls.ca_path | default('/var/lib/vault/tls/vault-ca.pem') }}"
+    leader_client_cert_file = "{{ vault.tls.cert_path | default('/var/lib/vault/tls/vault-cert.pem') }}"
+    leader_client_key_file  = "{{ vault.tls.cert_path | default('/var/lib/vault/tls/vault-key.pem') }}"
+  }
+
+{%- endfor %}
+}
+
+{%- if vault.config.telemetry %}
+
+telemetry {
+  prometheus_retention_time = "{{ vault.config.telemetry.prometheus_retention_time }}"
+  disable_hostname = true
+}
+{%- endif %}
+
+{%- if vault.config.seal_type and vault.config.vault_token %}
+
+seal "{{ vault.config.seal_type }}" {
+  address = "{{ vault.config.seal_address }}"
+  disable_renewal = "{{ vault.config.seal_disable_renewal | lower }}"
+  key_name = "{{ vault.config.seal_key_name }}"
+  mount_path = "{{ vault.config.seal_mount_path }}"
+  tls_skip_verify = "{{ vault.config.seal_tls_skip_verify | lower }}"
+}
+{%- endif %}

@@ -16,3 +16,15 @@
 
 {#- Merge the vault pillar #}
 {%- set vault = salt['pillar.get']('vault', default=merged_defaults, merge=True) %}
+
+{%- set servers_ips = {} %}
+{%- for server in vault["config"]["storage"]["retry_join"] %}
+{%- set ips = salt['mine.get'](server, 'network.ip_addrs').get(server, False) %}
+{%- if not ips %}
+{%- set ips = salt['dnsutil.A'](server) %}
+{%- endif %}
+{%- set current_ip = ips[0] %}
+{%- do servers_ips.update({server: current_ip}) %}
+{%- endfor %}
+
+{%- do vault.update({"servers_ips": servers_ips}) %}

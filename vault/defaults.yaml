@@ -2,7 +2,7 @@
 # vim: ft=yaml
 ---
 vault:
-  version: 1.1.0
+  version: 1.13.0
   platform: linux_amd64
   gpg_pkg: gnupg2
   setcap_pkg: libcap
@@ -11,6 +11,18 @@ vault:
   self_signed_cert:
     enabled: false
   config:
+    hcl_format: False
+    hostname: localhost
+    disable_mlock: False
+    ui: False
+    service_registration: {}
+    telemetry: {}
+    seal_type: False
+    seal_disable_renewal: False
+    seal_tls_skip_verify: False
+    vault_token: False
+    storage:
+      retry_join: []
     listener:
       tcp:
         address: "0.0.0.0:8200"
@@ -19,6 +31,10 @@ vault:
         tls_key_file: ""
     default_lease_ttl: 768h
     max_lease_ttl: 768h
+  tls:
+    ca_content: False
+    cert_content: False
+    priv_content: False
   hashicorp_key_id: E8A032E094D8EB4EA189D270DA418C88A3219F7B
   hashicorp_gpg_key: |
     -----BEGIN PGP PUBLIC KEY BLOCK-----

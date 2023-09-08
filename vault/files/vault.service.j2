@@ -10,6 +10,7 @@ Group=vault
 PIDFile=/var/run/vault/vault.pid
 ExecStart=/usr/local/bin/vault server {% if vault.dev_mode %} -dev {% else %} -config=/etc/vault/conf.d {% endif %}
 ExecReload=/bin/kill -HUP $MAINPID
+EnvironmentFile=-/etc/vault/vault-systemd.env
 KillMode=process
 KillSignal=SIGTERM
 Restart=on-failure

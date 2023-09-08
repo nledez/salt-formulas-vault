@@ -17,6 +17,60 @@ vault-package-install-user-present:
     - require:
       - group: vault-package-install-group-present
 
+vault-package-etc:
+  file.directory:
+    - name: /etc/vault
+    - mode: 0755
+    - user: vault
+    - group: vault
+    - require:
+      - user: vault-package-install-user-present
+
+vault-package-etc-conf:
+  file.directory:
+    - name: /etc/vault/conf.d
+    - mode: 0750
+    - user: vault
+    - group: vault
+    - require:
+      - file: vault-package-etc
+
+vault-var-directory:
+  file.directory:
+    - name: /var/lib/vault
+    - mode: 0755
+    - user: vault
+    - group: vault
+    - require:
+      - user: vault-package-install-user-present
+
+vault-var-tls-directory:
+  file.directory:
+    - name: /var/lib/vault/tls
+    - mode: 0755
+    - user: vault
+    - group: vault
+    - require:
+      - file: vault-var-directory
+
+vault-var-data-directory:
+  file.directory:
+    - name: /var/lib/vault/data
+    - mode: 0750
+    - user: vault
+    - group: vault
+    - require:
+      - file: vault-var-directory
+
+vault-var-log-directory:
+  file.directory:
+    - name: /var/log/vault
+    - mode: 0750
+    - user: vault
+    - group: vault
+    - require:
+      - user: vault-package-install-user-present
+
 vault-package-install-file-directory:
   file.directory:
     - name: /opt/vault/v{{ vault.version }}
