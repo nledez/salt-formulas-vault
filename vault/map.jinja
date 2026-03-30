@@ -30,4 +30,9 @@
 {%- do servers_ips.update({server: current_ip}) %}
 {%- endfor %}
 
+{%- set hostname = vault.get('config', {}).get('hostname', False) %}
+{%- if hostname and hostname not in servers_ips and force_servers_ip and hostname in force_servers_ip %}
+{%- do servers_ips.update({hostname: force_servers_ip[hostname]}) %}
+{%- endif %}
+
 {%- do vault.update({"servers_ips": servers_ips}) %}
