@@ -3,7 +3,7 @@
 
 {% from "vault/map.jinja" import vault with context -%}
 
-{%- if vault["config"]["hcl_format"] %}
+{%- if vault["config"]["hcl_format"] == True %}
 vault-config-config-file:
   file.managed:
     - name: /etc/vault/conf.d/config.hcl
@@ -25,7 +25,7 @@ vault-config-config-file:
     - name: /etc/vault/conf.d/config.json
     - encoding: utf-8
     - formatter: json
-    - dataset: {{ vault.config | json }}
+    - dataset: {{ vault.config_json | json }}
     - user: root
     - group: vault
     - mode: 0640
